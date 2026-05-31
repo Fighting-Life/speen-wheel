@@ -1,9 +1,11 @@
 (() => {
   "use strict";
 
-  const DEFAULT_CPA_LINK =
+  const DEFAULT_CPA_LINK_v1 =
     "https://smrturl.co/a/se9c2956c51/20377?s1=brian-smith";
-  let CPA_LINK = DEFAULT_CPA_LINK;
+  const DEFAULT_CPA_LINK_v2 =
+    "https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2";
+  let CPA_LINK = DEFAULT_CPA_LINK_v2;
 
   let audioCtx = null;
   let tickIntervalId = null;
@@ -132,7 +134,7 @@
     } catch (e) {}
   }
 
-  const PRIZES = [
+  const PRIZESV1 = [
     {
       label: "Cash App\n$50",
       name: "Cash App",
@@ -199,7 +201,74 @@
     },
   ];
 
-  const SEGMENT_COUNT = PRIZES.length;
+  const PRIZESV2 = [
+    {
+      label: "Cash App\n$50",
+      name: "Cash App",
+      value: "$50",
+      emoji: "💸",
+      color: "#00D632",
+      link: "https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2",
+    },
+    {
+      label: "Amazon\n$150",
+      name: "Amazon Gift Card",
+      value: "$150",
+      emoji: "📦",
+      color: "#FF9900",
+      link: "https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2",
+    },
+    {
+      label: "PayPal\n$100",
+      name: "PayPal Cash",
+      value: "$100",
+      emoji: "💰",
+      color: "#003087",
+      link: "https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2",
+    },
+    {
+      label: "Walmart\n$75",
+      name: "Walmart Gift Card",
+      value: "$75",
+      emoji: "🛒",
+      color: "#007DC6",
+      link: "https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2",
+    },
+    {
+      label: "Cash App\n$150",
+      name: "Cash App",
+      value: "$150",
+      emoji: "💸",
+      color: "#00D632",
+      link: "https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2",
+    },
+    {
+      label: "PayPal\n$50",
+      name: "PayPal Cash",
+      value: "$50",
+      emoji: "💰",
+      color: "#009CDE",
+      link: "https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2",
+    },
+    {
+      label: "Amazon\n$100",
+      name: "Amazon Gift Card",
+      value: "$100",
+      emoji: "📦",
+      color: "#FF6900",
+      link: "https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2",
+    },
+    {
+      label: "Walmart\n$150",
+      name: "Walmart Gift Card",
+      value: "$150",
+      emoji: "🛒",
+      color: "#0071CE",
+      link: "https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2",
+    },
+  ];
+
+  const SEGMENT_COUNT = PRIZESV2.length;
   const ARC = (Math.PI * 2) / SEGMENT_COUNT;
 
   const canvas = document.getElementById("wheel");
@@ -278,7 +347,7 @@
       const current = {
         name: prize.name,
         value: prize.value,
-        link: prize.link || DEFAULT_CPA_LINK,
+        link: prize.link || DEFAULT_CPA_LINK_v2,
         wonAt: Date.now(),
       };
       const data = JSON.parse(localStorage.getItem(PRIZE_STORAGE_KEY) || "{}");
@@ -290,7 +359,7 @@
       return {
         name: prize.name,
         value: prize.value,
-        link: prize.link || DEFAULT_CPA_LINK,
+        link: prize.link || DEFAULT_CPA_LINK_v2,
         wonAt: Date.now(),
       };
     }
@@ -298,7 +367,7 @@
 
   function getCurrentClaimLink() {
     const storedPrize = getStoredPrize();
-    return storedPrize?.link || CPA_LINK || DEFAULT_CPA_LINK;
+    return storedPrize?.link || CPA_LINK || DEFAULT_CPA_LINK_v2;
   }
 
   function drawWheel(rot) {
@@ -313,7 +382,7 @@
       ctx.moveTo(R, R);
       ctx.arc(R, R, R - 4, startAngle, endAngle);
       ctx.closePath();
-      ctx.fillStyle = PRIZES[i].color;
+      ctx.fillStyle = PRIZESV2[i].color;
       ctx.fill();
 
       /* segment border */
@@ -338,7 +407,7 @@
       ctx.shadowColor = "rgba(0,0,0,.8)";
       ctx.shadowBlur = 4;
 
-      const lines = PRIZES[i].label.split("\n");
+      const lines = PRIZESV2[i].label.split("\n");
       lines.forEach((ln, li) => {
         ctx.fillText(
           ln,
@@ -400,7 +469,7 @@
   }
 
   function showCongrats(idx) {
-    const prize = PRIZES[idx];
+    const prize = PRIZESV2[idx];
     const currentPrize = saveCurrentPrize(prize);
     CPA_LINK = currentPrize.link;
     document.getElementById("modal-emoji").textContent = prize.emoji;
