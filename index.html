@@ -249,6 +249,52 @@
       margin-bottom: 1.5rem;
     }
 
+    /* ── Already-played modal ── */
+    #played-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.80);
+      backdrop-filter: blur(10px);
+      z-index: 950;
+      align-items: center;
+      justify-content: center;
+    }
+    #played-overlay.show { display: flex; }
+
+    #played-box {
+      background: linear-gradient(145deg, #1a0a0f, #2a0a1a, #1a0a2e);
+      border: 2px solid rgba(255,77,109,.45);
+      border-radius: 24px;
+      padding: 2.5rem 2rem;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 0 80px rgba(255,77,109,.25), 0 30px 60px rgba(0,0,0,.7);
+      animation: pop-in .4s cubic-bezier(.34,1.56,.64,1);
+    }
+
+    #played-claim-btn {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: .12em;
+      background: linear-gradient(135deg, #ff4d6d, #ff6b35);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      padding: 14px 48px;
+      border-radius: 60px;
+      box-shadow: 0 0 30px rgba(255,77,109,.5);
+      transition: transform .15s, box-shadow .15s;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: .25rem;
+    }
+    #played-claim-btn:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 50px rgba(255,77,109,.7);
+    }
+
     /* ticket badge */
     .ticket-badge {
       display: inline-flex;
@@ -352,7 +398,33 @@
     </div>
   </section>
 
-  <!-- ── MODAL ── -->
+  <!-- ── ALREADY PLAYED MODAL ── -->
+  <div id="played-overlay" role="dialog" aria-modal="true" aria-labelledby="played-title">
+    <div id="played-box">
+      <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:24px;">
+        <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 0%, rgba(255,77,109,.12), transparent 70%);"></div>
+      </div>
+
+      <div class="text-5xl mb-3">⚠️</div>
+
+      <h2 id="played-title" style="font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:.05em;background:linear-gradient(135deg,#ff4d6d,#ff6b35,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" class="mb-2">SPIN LIMIT REACHED</h2>
+
+      <p class="text-white/70 font-bold text-sm mb-1">You've already used your 1 free spin today.</p>
+      <p class="text-white/40 text-xs mb-5">Each user is allowed <strong class="text-yellow-400">one spin only</strong>. Come back tomorrow for a new chance!</p>
+
+      <!-- divider -->
+      <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(255,77,109,.4),transparent);margin-bottom:1.25rem;"></div>
+
+      <p class="text-white/60 text-sm mb-1 font-bold">🎁 Your prize is still waiting!</p>
+      <p class="text-white/40 text-xs mb-5">Click below to claim your reward through our verified partner.</p>
+
+      <a id="played-claim-btn" href="#" target="_blank" rel="noopener noreferrer">🎁 &nbsp;CLAIM NOW</a>
+
+      <p class="text-white/25 text-[10px] mt-4">Offer provided by trusted partner network. Complete verification steps to receive reward.</p>
+    </div>
+  </div>
+
+  <!-- ── CONGRATULATIONS MODAL ── -->
   <div id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div id="modal-box">
       <!-- decorative rings -->
@@ -388,7 +460,136 @@
     'use strict';
 
     /* ── OFFER LINK (replace with your MaxBounty CPA link) ── */
-    const CPA_LINK = 'https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2'; // ← Replace with actual offer URL
+    const CPA_LINK = 'https://www.maxbounty.com/'; // ← Replace with actual offer URL
+
+    /* ════════════════════════════════════════════
+       WEB AUDIO — Spin sound engine (no external file needed)
+       Uses OscillatorNode: ticking clicks + pitch whoosh
+    ════════════════════════════════════════════ */
+    let audioCtx = null;
+    let tickIntervalId = null;
+    let whooshNode = null;
+    let whooshGain = null;
+
+    function getAudioCtx() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      return audioCtx;
+    }
+
+    /* single tick click */
+    function playTick(freq = 900, vol = 0.18) {
+      try {
+        const ac  = getAudioCtx();
+        const osc = ac.createOscillator();
+        const gain = ac.createGain();
+        osc.connect(gain);
+        gain.connect(ac.destination);
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(freq, ac.currentTime);
+        gain.gain.setValueAtTime(vol, ac.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + 0.06);
+        osc.start(ac.currentTime);
+        osc.stop(ac.currentTime + 0.07);
+      } catch(e) {}
+    }
+
+    /* whoosh — rising then falling pitched noise during spin */
+    function startSpinSound() {
+      try {
+        const ac = getAudioCtx();
+
+        /* Whoosh oscillator */
+        whooshNode = ac.createOscillator();
+        whooshGain = ac.createGain();
+
+        // White noise buffer for texture
+        const bufSize = ac.sampleRate * 2;
+        const noiseBuffer = ac.createBuffer(1, bufSize, ac.sampleRate);
+        const data = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
+
+        const noiseSource = ac.createBufferSource();
+        noiseSource.buffer = noiseBuffer;
+        noiseSource.loop = true;
+
+        // Band-pass filter to shape noise into "whoosh"
+        const bpf = ac.createBiquadFilter();
+        bpf.type = 'bandpass';
+        bpf.frequency.setValueAtTime(200, ac.currentTime);
+        bpf.frequency.linearRampToValueAtTime(900, ac.currentTime + 1.5);
+        bpf.Q.value = 1.2;
+
+        const noiseGain = ac.createGain();
+        noiseGain.gain.setValueAtTime(0, ac.currentTime);
+        noiseGain.gain.linearRampToValueAtTime(0.22, ac.currentTime + 0.3);
+
+        noiseSource.connect(bpf);
+        bpf.connect(noiseGain);
+        noiseGain.connect(ac.destination);
+        noiseSource.start();
+
+        /* Save refs to stop later */
+        whooshNode._noiseSource = noiseSource;
+        whooshNode._noiseGain   = noiseGain;
+        whooshNode._bpf         = bpf;
+        whooshNode._noiseGain   = noiseGain;
+
+        // Tick interval — fast at start, slows with velocity
+        let tickRate = 60;
+        tickIntervalId = setInterval(() => {
+          if (!spinning) {
+            clearInterval(tickIntervalId);
+            return;
+          }
+          // pitch the tick with current velocity
+          const pitch = 400 + Math.min(velocity, 0.4) * 3000;
+          playTick(pitch, 0.14);
+          // slow tick rate as wheel decelerates
+          const newRate = Math.max(60, 500 - velocity * 3000);
+          if (Math.abs(newRate - tickRate) > 30) {
+            clearInterval(tickIntervalId);
+            tickRate = newRate;
+            tickIntervalId = setInterval(arguments.callee, tickRate);
+          }
+        }, tickRate);
+
+      } catch(e) {}
+    }
+
+    function stopSpinSound() {
+      try {
+        clearInterval(tickIntervalId);
+        if (whooshNode && whooshNode._noiseGain) {
+          const ac = getAudioCtx();
+          whooshNode._noiseGain.gain.linearRampToValueAtTime(0, ac.currentTime + 0.5);
+          setTimeout(() => {
+            try { whooshNode._noiseSource.stop(); } catch(e) {}
+          }, 600);
+        }
+      } catch(e) {}
+    }
+
+    /* Win fanfare */
+    function playWinSound() {
+      try {
+        const ac = getAudioCtx();
+        const notes = [523, 659, 784, 1047]; // C E G C
+        notes.forEach((freq, i) => {
+          const osc  = ac.createOscillator();
+          const gain = ac.createGain();
+          osc.connect(gain);
+          gain.connect(ac.destination);
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          const t = ac.currentTime + i * 0.13;
+          gain.gain.setValueAtTime(0, t);
+          gain.gain.linearRampToValueAtTime(0.25, t + 0.05);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+          osc.start(t);
+          osc.stop(t + 0.5);
+        });
+      } catch(e) {}
+    }
 
     /* ── Prize definitions ── */
     const PRIZES = [
@@ -559,8 +760,10 @@
       } else {
         velocity = 0;
         spinning = false;
+        stopSpinSound();
         const idx = getWinningIndex(rotation);
         setTimeout(() => {
+          playWinSound();
           spawnConfetti();
           showCongrats(idx);
         }, 300);
@@ -580,6 +783,10 @@
       playBanner.style.display = 'block';
       ticketStatus.textContent = 'SPIN USED';
       spinMsg.textContent = 'You have already used your free spin.';
+      // Set claim link on played modal
+      document.getElementById('played-claim-btn').href = CPA_LINK;
+      // Show the already-played modal immediately
+      document.getElementById('played-overlay').classList.add('show');
     }
 
     spinBtn.addEventListener('click', () => {
@@ -601,14 +808,16 @@
       velocity = target * (1 - FRICTION);
 
       cancelAnimationFrame(rafId);
+      startSpinSound();
       spinFrame();
     });
 
-    /* ── Close modal on overlay click ── */
+    /* ── Close modals on overlay click ── */
     document.getElementById('modal-overlay').addEventListener('click', (e) => {
-      if (e.target === e.currentTarget) {
-        e.currentTarget.classList.remove('show');
-      }
+      if (e.target === e.currentTarget) e.currentTarget.classList.remove('show');
+    });
+    document.getElementById('played-overlay').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) e.currentTarget.classList.remove('show');
     });
 
     /* ── Idle wheel shimmer ── */
