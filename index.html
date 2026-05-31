@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lucky Spin — Win Big Today!</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --gold: #FFD700;
+      --gold2: #FFA500;
+      --dark: #0a0a0f;
+      --card: #12121a;
+      --accent: #ff4d6d;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--dark);
+      font-family: 'Nunito', sans-serif;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    /* ── Stars background ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 20% 30%, rgba(255,215,0,.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 60% 70%, rgba(255,165,0,.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 80% 20%, rgba(255,255,255,.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 40% 80%, rgba(255,215,0,.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 50%, rgba(255,255,255,.2) 0%, transparent 100%);
+      background-size: 400px 400px, 300px 300px, 500px 500px, 350px 350px, 450px 450px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── HIDDEN ARTICLE SECTIONS (CPM/AdSense inject) ── */
+    .hidden-article {
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+    }
+
+    /* ── Glow heading ── */
+    .glow-text {
+      font-family: 'Bebas Neue', sans-serif;
+      background: linear-gradient(135deg, var(--gold), var(--gold2), #fff, var(--gold));
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s ease infinite;
+    }
+    @keyframes shimmer {
+      0%,100%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+    }
+
+    /* ── Wheel container ── */
+    #wheel-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* outer glow ring */
+    #wheel-wrap::before {
+      content: '';
+      position: absolute;
+      inset: -12px;
+      border-radius: 50%;
+      background: conic-gradient(
+        #FFD700, #FF6B35, #9B59B6, #3498DB,
+        #2ECC71, #E74C3C, #F39C12, #FFD700
+      );
+      animation: rotate-ring 4s linear infinite;
+      filter: blur(6px);
+      opacity: .7;
+      z-index: 0;
+    }
+    @keyframes rotate-ring { to { transform: rotate(360deg); } }
+
+    canvas#wheel {
+      position: relative;
+      z-index: 1;
+      border-radius: 50%;
+      box-shadow: 0 0 60px rgba(255,215,0,.35);
+    }
+
+    /* pointer arrow */
+    #pointer {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      filter: drop-shadow(0 0 8px var(--gold));
+    }
+
+    /* center hub */
+    #hub {
+      position: absolute;
+      width: 54px; height: 54px;
+      background: radial-gradient(circle at 35% 35%, #fff 0%, var(--gold) 40%, #8B6914 100%);
+      border-radius: 50%;
+      z-index: 10;
+      box-shadow: 0 0 20px rgba(255,215,0,.8);
+      border: 3px solid rgba(255,255,255,.4);
+    }
+
+    /* ── Spin Button ── */
+    #spinBtn {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: .1em;
+      background: linear-gradient(135deg, var(--gold), var(--gold2));
+      color: #000;
+      border: none;
+      cursor: pointer;
+      padding: 16px 52px;
+      border-radius: 60px;
+      box-shadow: 0 0 30px rgba(255,165,0,.5), 0 8px 32px rgba(0,0,0,.4);
+      transition: transform .15s, box-shadow .15s;
+      position: relative;
+      overflow: hidden;
+    }
+    #spinBtn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.25), transparent);
+      border-radius: inherit;
+    }
+    #spinBtn:hover:not(:disabled) {
+      transform: translateY(-3px) scale(1.04);
+      box-shadow: 0 0 50px rgba(255,165,0,.7), 0 12px 40px rgba(0,0,0,.4);
+    }
+    #spinBtn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    /* ── Prize cards ── */
+    .prize-card {
+      background: linear-gradient(135deg, rgba(255,215,0,.08), rgba(255,165,0,.05));
+      border: 1px solid rgba(255,215,0,.2);
+      border-radius: 14px;
+      backdrop-filter: blur(6px);
+      transition: transform .2s, border-color .2s;
+    }
+    .prize-card:hover { transform: translateY(-4px); border-color: rgba(255,215,0,.5); }
+
+    /* ── Confetti ── */
+    .confetti-piece {
+      position: fixed;
+      width: 10px; height: 14px;
+      border-radius: 2px;
+      opacity: 0;
+      animation: confetti-fall 2.8s ease-in forwards;
+      pointer-events: none;
+      z-index: 999;
+    }
+    @keyframes confetti-fall {
+      0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* ── Modal ── */
+    #modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.75);
+      backdrop-filter: blur(8px);
+      z-index: 900;
+      align-items: center;
+      justify-content: center;
+    }
+    #modal-overlay.show { display: flex; }
+
+    #modal-box {
+      background: linear-gradient(145deg, #1a1a2e, #16213e, #0f3460);
+      border: 2px solid rgba(255,215,0,.4);
+      border-radius: 24px;
+      padding: 2.5rem 2rem;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 0 80px rgba(255,215,0,.2), 0 30px 60px rgba(0,0,0,.6);
+      animation: pop-in .4s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes pop-in {
+      from { transform: scale(.6); opacity: 0; }
+      to   { transform: scale(1);  opacity: 1; }
+    }
+
+    #claim-btn {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: .12em;
+      background: linear-gradient(135deg, #ff4d6d, #ff6b35);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      padding: 14px 48px;
+      border-radius: 60px;
+      box-shadow: 0 0 30px rgba(255,77,109,.5);
+      transition: transform .15s, box-shadow .15s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    #claim-btn:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 50px rgba(255,77,109,.7);
+    }
+
+    /* pulse ring on modal */
+    .pulse-ring {
+      position: absolute;
+      inset: -20px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,215,0,.3);
+      animation: pulse-ring 1.8s ease-out infinite;
+    }
+    @keyframes pulse-ring {
+      0%   { transform: scale(.9); opacity: .8; }
+      100% { transform: scale(1.25); opacity: 0; }
+    }
+
+    /* ── Already played banner ── */
+    #played-banner {
+      display: none;
+      background: linear-gradient(135deg, rgba(255,77,109,.15), rgba(255,107,53,.1));
+      border: 1px solid rgba(255,77,109,.4);
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ticket badge */
+    .ticket-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,215,0,.12);
+      border: 1px solid rgba(255,215,0,.3);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: .85rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+  </style>
+</head>
+<body class="relative min-h-screen">
+
+  <!-- ═══════════════════════════════════════════════════
+       HIDDEN ARTICLE SECTIONS — AdSense / CPM inject
+       opacity-0, overflow hidden, no layout impact
+  ════════════════════════════════════════════════════ -->
+  <article class="hidden-article" aria-hidden="true" id="hidden-left">
+    <h2>Best Online Giveaways 2025</h2>
+    <p>Discover the top giveaways and sweepstakes available online. Win cash prizes, gift cards from major retailers including Amazon, Walmart, PayPal cash rewards, and Cash App transfers. Legitimate prize promotions offer verified payouts ranging from $50 to $150 instantly. Enter today for your chance at real money rewards through trusted offer networks and CPA giveaway platforms.</p>
+    <p>Amazon gift card giveaway $50 $100 $150. Walmart gift card free. PayPal cash prize. Cash App reward sweepstakes. Win money online instantly. Free gift card spin wheel game prize draw.</p>
+  </article>
+
+  <article class="hidden-article" aria-hidden="true" id="hidden-right">
+    <h2>Free Gift Card Promotions — Spin to Win</h2>
+    <p>Spin wheel games offering real prizes in 2025. Verified giveaway networks provide Cash App payouts, Walmart gift cards, Amazon vouchers, and PayPal transfers. Join thousands of daily winners claiming their rewards through secure offer walls. One spin per user. Instant prize reveal. Claim your reward now through our verified partner network.</p>
+    <p>Online prize wheel game. Gift card giveaway. Win $50 $100 $150 prize. Real cash giveaway. Sweepstakes 2025. Free spin win money PayPal Cash App Amazon Walmart.</p>
+  </article>
+  <!-- ═══ end hidden articles ═══ -->
+
+  <!-- ── HEADER ── -->
+  <header class="relative z-10 py-5 px-6 flex items-center justify-between max-w-6xl mx-auto">
+    <div class="flex items-center gap-3">
+      <span class="text-3xl">🎰</span>
+      <span class="glow-text text-3xl tracking-widest">LUCKY SPIN</span>
+    </div>
+    <div class="ticket-badge">
+      <span>🎟</span>
+      <span id="ticket-status">1 FREE SPIN</span>
+    </div>
+  </header>
+
+  <!-- ── HERO ── -->
+  <section class="relative z-10 text-center pt-4 pb-2 px-4">
+    <p class="text-yellow-400/70 uppercase tracking-[.3em] text-xs font-bold mb-3">🔥 Limited Time — Real Prizes</p>
+    <h1 class="glow-text text-6xl sm:text-8xl leading-none mb-3">WIN UP TO<br/>$150 CASH</h1>
+    <p class="text-white/60 text-sm sm:text-base max-w-md mx-auto">
+      Spin the wheel once and win a real reward — Cash App, PayPal, Amazon, or Walmart gift card. <strong class="text-yellow-400">One spin per user.</strong>
+    </p>
+  </section>
+
+  <!-- ── ALREADY PLAYED NOTICE ── -->
+  <div class="relative z-10 max-w-md mx-auto px-4 mt-4">
+    <div id="played-banner">
+      <p class="text-red-400 font-bold text-sm text-center">⚠️ You've already used your free spin! Each user gets one spin only.</p>
+    </div>
+  </div>
+
+  <!-- ── WHEEL AREA ── -->
+  <main class="relative z-10 flex flex-col items-center gap-6 py-6 px-4">
+
+    <div id="wheel-wrap" style="width:320px;height:320px;">
+      <!-- SVG pointer -->
+      <svg id="pointer" width="36" height="36" viewBox="0 0 36 36">
+        <polygon points="18,2 30,32 18,24 6,32" fill="#FFD700" stroke="#FFA500" stroke-width="1.5"/>
+      </svg>
+      <canvas id="wheel" width="300" height="300"></canvas>
+      <div id="hub"></div>
+    </div>
+
+    <button id="spinBtn">🎰 &nbsp;SPIN NOW</button>
+
+    <p id="spin-msg" class="text-white/40 text-xs text-center max-w-xs"></p>
+  </main>
+
+  <!-- ── PRIZE LIST ── -->
+  <section class="relative z-10 max-w-4xl mx-auto px-4 pb-16 grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2">
+    <div class="prize-card p-4 text-center">
+      <div class="text-3xl mb-2">💸</div>
+      <p class="font-black text-yellow-400 text-sm">Cash App</p>
+      <p class="text-white/60 text-xs mt-1">$50 – $150</p>
+    </div>
+    <div class="prize-card p-4 text-center">
+      <div class="text-3xl mb-2">🛒</div>
+      <p class="font-black text-yellow-400 text-sm">Walmart Gift Card</p>
+      <p class="text-white/60 text-xs mt-1">$50 – $150</p>
+    </div>
+    <div class="prize-card p-4 text-center">
+      <div class="text-3xl mb-2">📦</div>
+      <p class="font-black text-yellow-400 text-sm">Amazon Gift Card</p>
+      <p class="text-white/60 text-xs mt-1">$50 – $150</p>
+    </div>
+    <div class="prize-card p-4 text-center">
+      <div class="text-3xl mb-2">💰</div>
+      <p class="font-black text-yellow-400 text-sm">PayPal Cash</p>
+      <p class="text-white/60 text-xs mt-1">$50 – $150</p>
+    </div>
+  </section>
+
+  <!-- ── MODAL ── -->
+  <div id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div id="modal-box">
+      <!-- decorative rings -->
+      <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:24px;">
+        <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 0%, rgba(255,215,0,.12), transparent 70%);"></div>
+      </div>
+
+      <div class="text-6xl mb-3" id="modal-emoji">🎉</div>
+
+      <h2 id="modal-title" class="glow-text text-5xl mb-1">CONGRATULATIONS!</h2>
+
+      <p class="text-white/50 text-sm mb-4" id="modal-subtitle-top">You just won a real prize!</p>
+
+      <!-- prize pill -->
+      <div class="inline-block bg-yellow-400/10 border border-yellow-400/30 rounded-2xl px-6 py-3 mb-5">
+        <p id="modal-prize-name" class="text-yellow-300 font-black text-xl"></p>
+        <p id="modal-prize-value" class="text-white font-black text-4xl mt-1"></p>
+      </div>
+
+      <p class="text-white/40 text-xs mb-6">🔒 Verified prize — click below to claim your reward securely.</p>
+
+      <a id="claim-btn" href="#" target="_blank" rel="noopener noreferrer">🎁 &nbsp;CLAIM NOW</a>
+
+      <p class="text-white/25 text-[10px] mt-4">Offer provided by trusted partner network. Complete verification steps to receive reward.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       JAVASCRIPT
+  ══════════════════════════════════════════ -->
+  <script>
+  (() => {
+    'use strict';
+
+    /* ── OFFER LINK (replace with your MaxBounty CPA link) ── */
+    const CPA_LINK = 'https://www.maxbounty.com/'; // ← Replace with actual offer URL
+
+    /* ── Prize definitions ── */
+    const PRIZES = [
+      { label: 'Cash App\n$50',     name: 'Cash App',          value: '$50',  emoji: '💸', color: '#00D632' },
+      { label: 'Amazon\n$150',      name: 'Amazon Gift Card',  value: '$150', emoji: '📦', color: '#FF9900' },
+      { label: 'PayPal\n$100',      name: 'PayPal Cash',       value: '$100', emoji: '💰', color: '#003087' },
+      { label: 'Walmart\n$75',      name: 'Walmart Gift Card', value: '$75',  emoji: '🛒', color: '#007DC6' },
+      { label: 'Cash App\n$150',    name: 'Cash App',          value: '$150', emoji: '💸', color: '#00D632' },
+      { label: 'PayPal\n$50',       name: 'PayPal Cash',       value: '$50',  emoji: '💰', color: '#009CDE' },
+      { label: 'Amazon\n$100',      name: 'Amazon Gift Card',  value: '$100', emoji: '📦', color: '#FF6900' },
+      { label: 'Walmart\n$150',     name: 'Walmart Gift Card', value: '$150', emoji: '🛒', color: '#0071CE' },
+    ];
+
+    const SEGMENT_COUNT = PRIZES.length;
+    const ARC = (Math.PI * 2) / SEGMENT_COUNT;
+
+    /* ── Canvas setup ── */
+    const canvas = document.getElementById('wheel');
+    const ctx    = canvas.getContext('2d');
+    const R      = canvas.width / 2;
+
+    /* ── State ── */
+    let rotation     = 0;
+    let spinning     = false;
+    let velocity     = 0;
+    let rafId        = null;
+    let hasPlayed    = false;
+
+    /* ── One-play detection (localStorage + fingerprint) ── */
+    const STORAGE_KEY = 'ls_spin_played_v1';
+
+    function getFingerprint() {
+      const ua   = navigator.userAgent;
+      const lang = navigator.language;
+      const tz   = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const scr  = `${screen.width}x${screen.height}x${screen.colorDepth}`;
+      const raw  = `${ua}|${lang}|${tz}|${scr}`;
+      let h = 0;
+      for (let i = 0; i < raw.length; i++) {
+        h = Math.imul(31, h) + raw.charCodeAt(i) | 0;
+      }
+      return Math.abs(h).toString(36);
+    }
+
+    function checkAlreadyPlayed() {
+      try {
+        const fp   = getFingerprint();
+        const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        return !!(data[fp] || data['played']);
+      } catch { return false; }
+    }
+
+    function markPlayed() {
+      try {
+        const fp   = getFingerprint();
+        const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        data[fp]       = Date.now();
+        data['played'] = true;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      } catch {}
+    }
+
+    /* ── Draw wheel ── */
+    function drawWheel(rot) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < SEGMENT_COUNT; i++) {
+        const startAngle = rot + i * ARC - Math.PI / 2;
+        const endAngle   = startAngle + ARC;
+
+        /* segment fill */
+        ctx.beginPath();
+        ctx.moveTo(R, R);
+        ctx.arc(R, R, R - 4, startAngle, endAngle);
+        ctx.closePath();
+        ctx.fillStyle = PRIZES[i].color;
+        ctx.fill();
+
+        /* segment border */
+        ctx.strokeStyle = 'rgba(0,0,0,.25)';
+        ctx.lineWidth   = 2;
+        ctx.stroke();
+
+        /* shine overlay */
+        const grad = ctx.createRadialGradient(R, R, R * .1, R, R, R - 4);
+        grad.addColorStop(0, 'rgba(255,255,255,.06)');
+        grad.addColorStop(1, 'rgba(0,0,0,.12)');
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        /* label */
+        ctx.save();
+        ctx.translate(R, R);
+        ctx.rotate(startAngle + ARC / 2);
+        ctx.textAlign  = 'right';
+        ctx.fillStyle  = '#fff';
+        ctx.font       = 'bold 12px Nunito, sans-serif';
+        ctx.shadowColor = 'rgba(0,0,0,.8)';
+        ctx.shadowBlur  = 4;
+
+        const lines = PRIZES[i].label.split('\n');
+        lines.forEach((ln, li) => {
+          ctx.fillText(ln, R - 16, li * 16 - (lines.length - 1) * 8);
+        });
+        ctx.restore();
+      }
+
+      /* rim */
+      ctx.beginPath();
+      ctx.arc(R, R, R - 4, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255,215,0,.6)';
+      ctx.lineWidth   = 6;
+      ctx.stroke();
+    }
+
+    drawWheel(0);
+
+    /* ── Determine winning segment ── */
+    function getWinningIndex(rot) {
+      const norm = ((rot % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+      const angle = (Math.PI * 2 - norm + Math.PI / 2) % (Math.PI * 2);
+      return Math.floor(angle / ARC) % SEGMENT_COUNT;
+    }
+
+    /* ── Confetti burst ── */
+    function spawnConfetti() {
+      const colors = ['#FFD700','#FF4D6D','#00D632','#4FC3F7','#FF6B35','#fff'];
+      for (let i = 0; i < 80; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti-piece';
+        el.style.cssText = `
+          left:${Math.random() * 100}vw;
+          top:${-10 - Math.random() * 20}px;
+          background:${colors[i % colors.length]};
+          animation-delay:${Math.random() * .8}s;
+          animation-duration:${2 + Math.random() * 1.5}s;
+          transform:rotate(${Math.random() * 360}deg);
+          width:${6 + Math.random() * 8}px;
+          height:${8 + Math.random() * 10}px;
+          border-radius:${Math.random() > .5 ? '50%' : '2px'};
+        `;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 4000);
+      }
+    }
+
+    /* ── Show modal ── */
+    function showCongrats(idx) {
+      const prize = PRIZES[idx];
+      document.getElementById('modal-emoji').textContent       = prize.emoji;
+      document.getElementById('modal-prize-name').textContent  = prize.name;
+      document.getElementById('modal-prize-value').textContent = prize.value;
+      document.getElementById('claim-btn').href                = CPA_LINK;
+      document.getElementById('modal-overlay').classList.add('show');
+    }
+
+    /* ── Spin animation ── */
+    const FRICTION = 0.985;
+    const MIN_SPINS = 5;
+
+    function spinFrame() {
+      rotation += velocity;
+      velocity  *= FRICTION;
+      drawWheel(rotation);
+
+      if (velocity > 0.003) {
+        rafId = requestAnimationFrame(spinFrame);
+      } else {
+        velocity = 0;
+        spinning = false;
+        const idx = getWinningIndex(rotation);
+        setTimeout(() => {
+          spawnConfetti();
+          showCongrats(idx);
+        }, 300);
+      }
+    }
+
+    /* ── Spin button ── */
+    const spinBtn   = document.getElementById('spinBtn');
+    const spinMsg   = document.getElementById('spin-msg');
+    const playBanner = document.getElementById('played-banner');
+    const ticketStatus = document.getElementById('ticket-status');
+
+    // init check
+    if (checkAlreadyPlayed()) {
+      hasPlayed = true;
+      spinBtn.disabled = true;
+      playBanner.style.display = 'block';
+      ticketStatus.textContent = 'SPIN USED';
+      spinMsg.textContent = 'You have already used your free spin.';
+    }
+
+    spinBtn.addEventListener('click', () => {
+      if (spinning || hasPlayed) return;
+
+      hasPlayed = true;
+      markPlayed();
+      spinning  = true;
+      spinBtn.disabled = true;
+      ticketStatus.textContent = 'SPIN USED';
+      spinMsg.textContent = 'Spinning… good luck! 🍀';
+
+      // random target: at least MIN_SPINS full rotations + random
+      const extra    = Math.random() * Math.PI * 2;
+      const target   = Math.PI * 2 * (MIN_SPINS + 3 * Math.random()) + extra;
+
+      // compute initial velocity so it naturally decelerates
+      // sum of geometric series: v / (1 - FRICTION) ≈ target
+      velocity = target * (1 - FRICTION);
+
+      cancelAnimationFrame(rafId);
+      spinFrame();
+    });
+
+    /* ── Close modal on overlay click ── */
+    document.getElementById('modal-overlay').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) {
+        e.currentTarget.classList.remove('show');
+      }
+    });
+
+    /* ── Idle wheel shimmer ── */
+    let idleAngle = 0;
+    function idleSpin() {
+      if (!spinning) {
+        idleAngle += 0.002;
+        drawWheel(rotation + idleAngle);
+      }
+      requestAnimationFrame(idleSpin);
+    }
+    idleSpin();
+
+  })();
+  </script>
+</body>
+</html>
