@@ -658,10 +658,10 @@ button.played-claim-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: min(calc(100vw - 2rem), 218px);
+  width: min(calc(100vw - 2rem), 520px);
   max-height: calc(100dvh - 2.5rem);
   overflow-y: auto;
-  padding: 46px 26px 26px;
+  padding: 44px 24px 24px;
   border: 2px solid rgba(255, 215, 0, 0.38);
   border-radius: 20px;
   background: linear-gradient(145deg, #171017, #111827);
@@ -700,10 +700,10 @@ button.played-claim-button {
 #float-ad-slot {
   display: grid;
   place-items: center;
-  width: 160px;
-  height: 600px;
-  min-width: 160px;
-  min-height: 600px;
+  width: 468px;
+  height: 60px;
+  min-width: 468px;
+  min-height: 60px;
   overflow: hidden;
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.18);
@@ -733,8 +733,8 @@ button.played-claim-button {
 
 #float-ad-slot iframe {
   display: block;
-  width: 160px !important;
-  height: 600px !important;
+  width: 468px !important;
+  height: 60px !important;
   max-width: none;
   max-height: none;
   border: 0;
@@ -947,22 +947,47 @@ button.played-claim-button {
   font-weight: 700;
 }
 
-.banner-horizontal {
+.float-top-container {
+  position: fixed;
+  top: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1080;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  height: auto;
-  margin: 5px 5px;
+  width: min(calc(100vw - 1rem), 468px);
+  height: 60px;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.32);
 }
 
-.native-ad-container {
+.float-bottom-container {
+  position: fixed;
+  bottom: 0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1080;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  height: auto;
-  margin: 5px 5px;
+  width: min(calc(100vw - 1rem), 468px);
+  height: 60px;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 -10px 26px rgba(0, 0, 0, 0.32);
+}
+
+.float-top-container iframe,
+.float-bottom-container iframe {
+  display: block;
+  width: 468px !important;
+  height: 60px !important;
+  max-width: none;
+  border: 0;
 }
 .float-ad-container {
   position: fixed;
@@ -1076,15 +1101,15 @@ button.played-claim-button {
   }
 
   #float-ad-box {
-    width: min(calc(100vw - 1.25rem), 206px);
+    width: min(calc(100vw - 1.25rem), 520px);
     max-height: calc(100dvh - 1.5rem);
-    padding: 44px 22px 22px;
+    padding: 42px 18px 18px;
     border-radius: 18px;
   }
 
   #float-ad-slot {
-    width: 160px;
-    height: 600px;
+    width: 468px;
+    height: 60px;
   }
 
   .offer-option {
@@ -1110,15 +1135,15 @@ button.played-claim-button {
   .footer-links a {
     font-size: 0.76rem;
   }
-  .banner-horizontal {
-    height: auto;
-    padding: 3px 3px;
-    width: 100%;
+  .float-top-container {
+    top: 0.35rem;
+    width: min(calc(100vw - 0.7rem), 468px);
+    height: 60px;
   }
-  .native-ad-container {
-    height: auto;
-    padding: 3px 3px;
-    width: 100%;
+  .float-bottom-container {
+    bottom: 0.35rem;
+    width: min(calc(100vw - 0.7rem), 468px);
+    height: 60px;
   }
 
   #float-ad-overlay {
@@ -1135,14 +1160,12 @@ button.played-claim-button {
     padding: 0.75rem;
   }
 
-  .banner-horizontal {
-    height: auto;
-    padding: 2px 2px;
-    width: 100%;
+  .float-top-container {
+    width: min(calc(100vw - 0.5rem), 468px);
+    height: 60px;
   }
-  .native-ad-container {
-    height: auto;
-    padding: 2px 2px;
-    width: 100%;
+  .float-bottom-container {
+    width: min(calc(100vw - 0.5rem), 468px);
+    height: 60px;
   }
 }

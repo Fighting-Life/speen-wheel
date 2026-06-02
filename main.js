@@ -4,7 +4,7 @@
   const DEFAULT_CPA_LINK_v1 =
     "https://smrturl.co/a/se9c2956c51/20377?s1=brian-smith";
   const DEFAULT_CPA_LINK_v2 =
-    "https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2";
+    "https://adclub.g2afse.com/click?pid=1274&offer_id=49&sub1=ryan";
   let CPA_LINK = DEFAULT_CPA_LINK_v2;
 
   let audioCtx = null;
@@ -208,7 +208,7 @@
       value: "$50",
       emoji: "💸",
       color: "#00D632",
-      link: "https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2",
+      link: "https://adclub.g2afse.com/click?pid=1274&offer_id=49&sub1=ryan",
     },
     {
       label: "Amazon\n$150",
@@ -216,7 +216,7 @@
       value: "$150",
       emoji: "📦",
       color: "#FF9900",
-      link: "https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2",
+      link: "https://adclub.g2afse.com/click?pid=1274&offer_id=49&sub1=ryan",
     },
     {
       label: "PayPal\n$100",
@@ -224,7 +224,7 @@
       value: "$100",
       emoji: "💰",
       color: "#003087",
-      link: "https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2",
+      link: "https://adclub.g2afse.com/click?pid=1274&offer_id=49&sub1=ryan",
     },
     {
       label: "Walmart\n$75",
@@ -232,7 +232,7 @@
       value: "$75",
       emoji: "🛒",
       color: "#007DC6",
-      link: "https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2",
+      link: "https://adclub.g2afse.com/click?pid=1274&offer_id=49&sub1=ryan",
     },
     {
       label: "Cash App\n$150",
@@ -240,7 +240,7 @@
       value: "$150",
       emoji: "💸",
       color: "#00D632",
-      link: "https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2",
+      link: "https://adclub.g2afse.com/click?pid=1274&offer_id=49&sub1=ryan",
     },
     {
       label: "PayPal\n$50",
@@ -248,7 +248,7 @@
       value: "$50",
       emoji: "💰",
       color: "#009CDE",
-      link: "https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2",
+      link: "https://adclub.g2afse.com/click?pid=1274&offer_id=49&sub1=ryan",
     },
     {
       label: "Amazon\n$100",
@@ -256,7 +256,7 @@
       value: "$100",
       emoji: "📦",
       color: "#FF6900",
-      link: "https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2",
+      link: "https://adclub.g2afse.com/click?pid=1274&offer_id=49&sub1=ryan",
     },
     {
       label: "Walmart\n$150",
@@ -264,7 +264,7 @@
       value: "$150",
       emoji: "🛒",
       color: "#0071CE",
-      link: "https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2",
+      link: "https://adclub.g2afse.com/click?pid=1274&offer_id=49&sub1=ryan",
     },
   ];
 
@@ -564,24 +564,20 @@
 
   const additionalOffer = [
     {
-      name: "PrizeZappy - Chance to Win $50K",
-      value:
-        "https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2",
+      name: "PrizeZappy - Chance to Win",
+      value: "https://adclub.g2afse.com/click?pid=1274&offer_id=49&sub1=ryan",
     },
     {
-      name: "DailySurge - $1,000 Coke vs Pepsi",
-      value:
-        "https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2",
+      name: "DailySurge - Coke vs Pepsi",
+      value: "https://adclub.g2afse.com/click?pid=1274&offer_id=49&sub1=ryan",
     },
     {
-      name: "GnG - CashApp $750",
-      value:
-        "https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2",
+      name: "GnG - CashApp",
+      value: "https://adclub.g2afse.com/click?pid=1274&offer_id=49&sub1=ryan",
     },
     {
-      name: "CTConnect - CashApp 750",
-      value:
-        "https://www.effectivecpmnetwork.com/psbk2ig1?key=8165df2aff912b4878eabd36311360f2",
+      name: "CTConnect - CashApp",
+      value: "https://adclub.g2afse.com/click?pid=1274&offer_id=49&sub1=ryan",
     },
   ];
 
@@ -712,16 +708,16 @@
 
     floatAdSlot.dataset.loaded = "true";
     window.atOptions = {
-      key: "44929407cd1c370639f8fabe67a8c241",
+      key: "62c406d8cc71855689db962800be30f2",
       format: "iframe",
-      height: 600,
-      width: 160,
+      height: 60,
+      width: 468,
       params: {},
     };
 
     const script = document.createElement("script");
     script.src =
-      "https://www.highperformanceformat.com/44929407cd1c370639f8fabe67a8c241/invoke.js";
+      "https://www.highperformanceformat.com/62c406d8cc71855689db962800be30f2/invoke.js";
     script.async = true;
     floatAdSlot.appendChild(script);
   }
