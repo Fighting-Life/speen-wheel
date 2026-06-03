@@ -747,7 +747,7 @@
       setTimeout(closeFloatAd, 150);
     }
   });
-  loadFloatAd();
+  // loadFloatAd();
 
   window.addEventListener("focus", () => checkPendingOfferCompletion(true));
   window.addEventListener("pageshow", () => checkPendingOfferCompletion(false));
